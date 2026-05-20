@@ -487,6 +487,30 @@ Isso ajuda a manter contratos claros entre backend, frontend e possíveis consum
 
 ## Como rodar o projeto
 
+### Deploy
+
+A API também pode ser publicada em ambiente cloud usando Docker.
+
+Neste projeto, o deploy pode ser feito como Web Service no Render, utilizando:
+
+- Dockerfile multi-stage
+- PostgreSQL gerenciado
+- Variável `DATABASE_URL`
+- `prisma migrate deploy` no start da aplicação
+- Health check em `/health`
+
+Após o deploy, a documentação Swagger fica disponível em:
+
+```txt
+https://URL_DA_API/docs
+```
+
+E o health check em:
+
+```txt
+https://URL_DA_API/health
+```
+
 ### Pré-requisitos
 
 - Docker
@@ -899,6 +923,60 @@ test/
   dashboard.e2e-spec.ts
 ```
 
+## Preparação para ambiente corporativo
+
+Além da execução local com Docker, o projeto inclui arquivos de apoio para cenários corporativos e cloud-native.
+
+### CI com GitHub Actions
+
+O projeto possui workflow em:
+
+```txt
+.github/workflows/ci.yml
+```
+
+Esse workflow executa:
+
+- instalação de dependências
+- geração do Prisma Client
+- migrations em PostgreSQL de teste
+- lint
+- testes unitários com coverage
+- testes e2e
+- build da aplicação
+
+### Jenkins, SonarQube e Nexus
+
+O projeto também inclui:
+
+```txt
+Jenkinsfile
+sonar-project.properties
+```
+
+O `Jenkinsfile` representa uma pipeline corporativa compatível com ambientes que usam Bitbucket + Jenkins, contemplando estágios de lint, testes, build, análise SonarQube, build de imagem Docker e publicação em registry Nexus.
+
+O `sonar-project.properties` deixa o projeto preparado para análise de qualidade com SonarQube, usando o relatório de cobertura gerado pelo Jest.
+
+### Kubernetes/EKS
+
+O projeto possui manifests Kubernetes em:
+
+```txt
+infra/k8s/
+```
+
+Arquivos incluídos:
+
+- `namespace.yaml`
+- `deployment.yaml`
+- `service.yaml`
+- `ingress.yaml`
+
+Esses manifests preparam a aplicação para execução em Kubernetes, incluindo readiness probe, liveness probe, service interno e ingress compatível com AWS Load Balancer Controller.
+
+Em uma arquitetura AWS, a API poderia ser executada no EKS, exposta por um Application Load Balancer provisionado pelo AWS Load Balancer Controller. Caso necessário, o AWS API Gateway poderia ficar na frente do Load Balancer usando VPC Link, adicionando uma camada extra de governança, roteamento e controle de entrada.
+
 ---
 
 ## Possíveis evoluções
@@ -906,11 +984,13 @@ test/
 Algumas melhorias possíveis para evolução futura:
 
 - Autenticação e autorização
-- Deploy em nuvem
+- Migração do deploy para AWS EKS
+- Exposição pública via AWS API Gateway integrado ao Application Load Balancer
+- Publicação real de imagem Docker em registry Nexus
+- Execução de quality gate real com SonarQube em ambiente corporativo
 - Cache para dashboard
 - Métricas com Prometheus
 - Logs estruturados em JSON
-- CI/CD
-- Índices únicos parciais no PostgreSQL para regras com soft delete
+- Índices únicos parciais no PostgreSQL para reforçar regras com soft delete
 - Filtros avançados no dashboard
 - Versionamento de API
