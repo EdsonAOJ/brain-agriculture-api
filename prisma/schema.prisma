@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DocumentType {
+  CPF
+  CNPJ
+}
+
+enum RecordStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Producer {
+  id           String       @id @default(uuid())
+  document     String       @unique
+  documentType DocumentType
+  name         String
+  status       RecordStatus @default(ACTIVE)
+  inactiveAt   DateTime?
+
+  farms Farm[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@map("producers")
+}
+
+model Farm {
+  id               String       @id @default(uuid())
+  producerId       String
+  name             String
+  city             String
+  state            String
+  totalArea        Decimal      @db.Decimal(12, 2)
+  agriculturalArea Decimal      @db.Decimal(12, 2)
+  vegetationArea   Decimal      @db.Decimal(12, 2)
+  status           RecordStatus @default(ACTIVE)
+  inactiveAt       DateTime?
+
+  producer Producer @relation(fields: [producerId], references: [id], onDelete: Restrict)
+
+  plantedCrops PlantedCrop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([producerId])
+  @@index([state])
+  @@index([status])
+  @@map("farms")
+}
+
+model Harvest {
+  id         String       @id @default(uuid())
+  name       String       @unique
+  status     RecordStatus @default(ACTIVE)
+  inactiveAt DateTime?
+
+  plantedCrops PlantedCrop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@map("harvests")
+}
+
+model Crop {
+  id         String       @id @default(uuid())
+  name       String       @unique
+  status     RecordStatus @default(ACTIVE)
+  inactiveAt DateTime?
+
+  plantedCrops PlantedCrop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@map("crops")
+}
+
+model PlantedCrop {
+  id        String       @id @default(uuid())
+  farmId    String
+  harvestId String
+  cropId    String
+  status    RecordStatus @default(ACTIVE)
+  inactiveAt DateTime?
+
+  farm    Farm    @relation(fields: [farmId], references: [id], onDelete: Restrict)
+  harvest Harvest @relation(fields: [harvestId], references: [id], onDelete: Restrict)
+  crop    Crop    @relation(fields: [cropId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([farmId])
+  @@index([harvestId])
+  @@index([cropId])
+  @@index([status])
+  @@map("planted_crops")
+}
