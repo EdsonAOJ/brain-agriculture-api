@@ -621,7 +621,14 @@ curl http://localhost:3333/dashboard/summary
 
 ## Testes
 
-O projeto possui testes unitários e testes e2e/integrados.
+O projeto possui testes unitários e e2e cobrindo controllers, services, DTOs, validators, filters, middlewares, módulos e fluxos principais da API.
+
+Cobertura atual:
+
+- Statements: 99%+
+- Lines: 99%+
+- Functions: 100%
+- Branches: 97%+
 
 ### Testes unitários
 

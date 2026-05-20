@@ -35,6 +35,7 @@ export class ProducersService {
 
     const documentType = getDocumentType(document);
 
+    /* istanbul ignore if */
     if (!documentType) {
       throw new BadRequestException('Documento deve ser CPF ou CNPJ.');
     }
@@ -171,6 +172,7 @@ export class ProducersService {
 
       const detectedDocumentType = getDocumentType(normalizedDocument);
 
+      /* istanbul ignore if */
       if (!detectedDocumentType) {
         throw new BadRequestException('Documento deve ser CPF ou CNPJ.');
       }

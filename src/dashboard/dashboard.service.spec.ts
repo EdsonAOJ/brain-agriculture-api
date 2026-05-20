@@ -148,4 +148,57 @@ describe('DashboardService', () => {
 
     expect(prismaMock.crop.findMany).not.toHaveBeenCalled();
   });
+
+  it('should return Unknown when crop name is not found', async () => {
+    prismaMock.farm.count.mockResolvedValue(1);
+
+    prismaMock.farm.aggregate.mockResolvedValue({
+      _sum: {
+        totalArea: 1000,
+        agriculturalArea: 700,
+        vegetationArea: 250,
+      },
+    });
+
+    prismaMock.farm.groupBy.mockResolvedValue([
+      {
+        state: 'SP',
+        _count: {
+          id: 1,
+        },
+      },
+    ]);
+
+    prismaMock.plantedCrop.groupBy.mockResolvedValue([
+      {
+        cropId: 'missing-crop-id',
+        _count: {
+          id: 2,
+        },
+      },
+    ]);
+
+    prismaMock.crop.findMany.mockResolvedValue([]);
+
+    await expect(service.getSummary()).resolves.toEqual({
+      totalFarms: 1,
+      totalHectares: 1000,
+      farmsByState: [
+        {
+          state: 'SP',
+          total: 1,
+        },
+      ],
+      farmsByCrop: [
+        {
+          crop: 'Unknown',
+          total: 2,
+        },
+      ],
+      landUse: {
+        agriculturalArea: 700,
+        vegetationArea: 250,
+      },
+    });
+  });
 });

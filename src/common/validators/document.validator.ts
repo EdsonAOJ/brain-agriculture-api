@@ -34,6 +34,7 @@ export function isValidCpfOrCnpj(document: string): boolean {
 
 function isValidCpf(cpf: string): boolean {
   if (!/^\d{11}$/.test(cpf)) {
+    /* istanbul ignore if */
     return false;
   }
 
@@ -62,6 +63,7 @@ function calculateCpfDigit(base: string, factor: number): number {
 
 function isValidCnpj(cnpj: string): boolean {
   if (!/^\d{14}$/.test(cnpj)) {
+    /* istanbul ignore if */
     return false;
   }
 

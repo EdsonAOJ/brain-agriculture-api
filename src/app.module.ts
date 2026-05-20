@@ -12,6 +12,7 @@ import { HealthModule } from './health/health.module';
 import { PlantedCropsModule } from './planted-crops/planted-crops.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProducersModule } from './producers/producers.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ProducersModule } from './producers/producers.module';
     PlantedCropsModule,
     DashboardModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_FILTER,
